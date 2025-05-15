@@ -1,0 +1,157 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+namespace SoloLearn
+{
+	public class Matrix
+	{
+		public double[,]  matrix;
+    public bool augmented;
+
+		public Matrix()
+		{
+
+		}
+
+		public Matrix(int rowCount, int columnCount)
+		{
+			matrix = new double[rowCount, columnCount];
+		}
+
+		public void SwapRows(int row1, int row2)
+		{
+			double[] buffer = new double[matrix.GetLength(1)];
+			double[] subArray1 = SubArray(row1);
+			double[] subArray2 = SubArray(row2);
+
+			CopyToMatrix(subArray2, row1);
+			CopyToMatrix(subArray1, row2);
+		}
+
+		//  Transposes a 2D array, whether square or rectangular.
+		public void Transpose()
+		{
+			double[,] newMatrix = new double [matrix.GetLength(1), matrix.GetLength(0)];
+			for (int j = 0; j < matrix.GetLength(1); j++)
+			{
+				for (int i = 0; i < matrix.GetLength(0); i++)
+				{
+					newMatrix[j, i] = matrix[i, j];
+				}
+			}
+			matrix = newMatrix;
+		}
+
+		//  Takes 2D array, searches for a specific subarray by the given
+		//  index, and returns a new array that serves as a replica of the subarray.
+		//  Why? Because C# has no syntax for accessing a subarray.
+		public double[] SubArray(int index)
+		{
+			double[] row = new double[matrix.GetLength(1)];
+			for (int i = 0; i < row.Length; i++)
+			{
+				row[i] = matrix[index, i];
+			}
+			return row;
+		}
+
+		//  Copies the values of an array to a specific subarray in a 2D array.
+		//  Returns the updated 2D array.
+		//  Why? Again, because C# has no syntax for accessing subarrays.
+		public void CopyToMatrix(double[] row, int index)
+		{
+			for (int i = 0; i < row.GetLength(0); i++)
+			{
+				matrix[index, i] = row [i];
+			}
+		}
+
+		//  Reliable printing function for any sized 2D array.
+		//  If the given matrix is augmented, a '|' will be placed
+		//  before the last value.
+		public void Print()
+		{
+			Console.WriteLine();
+			for (int i = 0; i < matrix.GetLength(0); i++)
+			{
+				for (int j = 0; j < matrix.GetLength(1); j++)
+				{
+					if (j + 2 == matrix.GetLength(1) && augmented)
+					{
+						Console.Write(matrix[i, j] + "|");
+					}
+					else Console.Write(matrix[i, j] + " ");
+				}
+				Console.WriteLine();
+			}
+		}
+
+		//  Returns new array with scaled array values.
+		//  Simple function that helps with readability.
+		public double[] ScaleRow(double[] row, double scalar)
+		{
+			for (int i = 0; i < row.GetLength(0); i++)
+			{
+				row[i] *= scalar;
+			}
+			return row;
+		}
+
+		//  Returns the sum of two arrays in a new array.
+		//  Another simple function that helps with readability.
+		public double[] AddRows(double[] row1, double[] row2)
+		{
+			double[] newRow = new double[row1.GetLength(0)];
+			for (int i = 0; i < newRow.GetLength(0); i++)
+			{
+				newRow[i] = row1[i] + row2[i];
+			}
+			return newRow;
+		}
+
+		//  Your best friend when reducing matrices to Row-Echelon Form.
+		//  Takes a 2D array, finds the specified subarrays, combines them into a new array,
+		//  and copies the new array to the 2D array.
+		//  Finally, returns the updated 2D array.
+		//  Technically, ScaleRow and Interchange are similar, albeit one is
+		//  more involved. But Scale Row is designed, alongside AddRows and CopyToMatrix,
+		//  to be used in Interchange. Interchange is designed to be used directly
+		//  in the main method.
+		
+		public void Interchange(int row1, double scalar1, int row2, double scalar2, int targetRow)
+		{
+			double[] r1 = SubArray(row1);
+			double[] r2 = SubArray(row2);
+
+			double[] newRow = AddRows(ScaleRow(r1, scalar1), ScaleRow(r2, scalar2));
+			CopyToMatrix(newRow, targetRow);
+		}
+
+	}
+
+	class Program : Matrix
+	{
+
+		static void Main(string[] args)
+		{
+
+			double [,] basicMatrix =
+			{
+				{-1, -3},
+				{-2, 2},
+				{-1, 3}
+			};
+
+			Matrix m = new Matrix(3, 2);
+			
+			m.matrix = basicMatrix;
+      m.augmented = false;
+			m.Print();
+			
+		}
+	}
+}
